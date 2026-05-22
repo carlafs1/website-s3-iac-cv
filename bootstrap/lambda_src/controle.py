@@ -11,8 +11,8 @@
 ####----                                                                                ----####
 ####----  2. Quando chamada pelo EventBridge:                                           ----####
 ####----     - Verifica last_accessed_at no DynamoDB.                                   ----####
-####----     - Se passou mais de 1 hora desde o último acesso, dispara destroy.         ----####
-####----     - Se ainda não passou 1 hora, apenas reagenda o EventBridge.               ----####
+####----     - Se passou o tempo configurado desde o último acesso, dispara destroy.    ----####
+####----     - Se ainda não passou o tempo configurado, apenas reagenda o EventBridge.  ----####
 ####----                                                                                ----####
 ####----  Observação:                                                                   ----####
 ####----  - Destroy nunca é disparado por acesso de usuário/API Gateway.                ----####
@@ -121,11 +121,12 @@ def lambda_handler(event, context):
             return _html_carregando()
 
         ####----------------------------------------------------------------####
-        ####----  Usuário acessou e o S3 existe.                         ----####
+        ####----  Usuário acessou e o S3 existe.                        ----####
         ####----                                                        ----####
         ####----  Regra:                                                ----####
         ####----  - atualiza last_accessed_at com o horário atual       ----####
-        ####----  - reagenda EventBridge para 1 hora após este acesso   ----####
+        ####----  - reagenda EventBridge para tempo configurado após    ----#### 
+        ####----    este acesso                                         ----#### 
         ####----  - redireciona para o site estático no S3              ----####
         ####----  - nunca dispara destroy                               ----####
         ####----------------------------------------------------------------####
@@ -145,9 +146,10 @@ def lambda_handler(event, context):
 
         print(f"last_accessed_at atualizado para: {now.isoformat()}")
 
-        next_run = now + timedelta(hours=1)
+        timeout_minutes = _get_site_timeout_minutes()
+        next_run = now + timedelta(minutes=timeout_minutes)
 
-        print("Reagendando EventBridge para 1 hora após este acesso...")
+        print("Reagendando EventBridge conforme timeout configurado...")
         print(f"Próxima execução: {next_run.isoformat()}")
 
         _reagendar_eventbridge(next_run)
@@ -180,7 +182,9 @@ def lambda_handler(event, context):
     if last_accessed_at.tzinfo is None:
         last_accessed_at = last_accessed_at.replace(tzinfo=timezone.utc)
 
-    expiration_time = last_accessed_at + timedelta(hours=1)
+
+    timeout_minutes = _get_site_timeout_minutes()
+    expiration_time = last_accessed_at + timedelta(minutes=timeout_minutes)
 
     print(f"Bucket ativo: {bucket_name}")
     print(f"Último acesso: {last_accessed_at.isoformat()}")
@@ -188,11 +192,12 @@ def lambda_handler(event, context):
     print(f"Horário de expiração: {expiration_time.isoformat()}")
 
     ####-------------------------------------------------------------------------####
-    ####----  Se o último acesso ocorreu há menos de 1 hora, o ambiente ainda  ----####
-    ####----  deve permanecer ativo. Nesse caso, apenas reagenda o EventBridge. ----####
+    ####----  Se o último acesso ocorreu há menos que o tempo configurado o  ----####
+    ####----  ambiente ainda deve permanecer ativo. Nesse caso, apenas .     ----####
+    ####----  reagenda o EventBridge                                         ----####
     ####-------------------------------------------------------------------------####
     if now < expiration_time:
-        print("Ainda não passou 1 hora desde o último acesso.")
+        print("Ainda não passou o tempo configurado desde o último acesso.")
         print("Reagendando EventBridge para o horário de expiração.")
 
         _reagendar_eventbridge(expiration_time)
@@ -207,10 +212,10 @@ def lambda_handler(event, context):
         }
 
     ####--------------------------------------------------------------------####
-    ####----  Passou mais de 1 hora sem acesso.                         ----####
-    ####----  Somente neste ponto o destroy pode ser disparado.          ----####
+    ####----  Passou mais que o tempo configurado sem acesso.           ----####
+    ####----  Somente neste ponto o destroy pode ser disparado.         ----####
     ####--------------------------------------------------------------------####
-    print("Mais de 1 hora sem acesso.")
+    print("Tempo configurado sem acesso expirado.")
     print("Origem confirmada: EventBridge.")
     print("Disparando workflow destroy...")
 
@@ -232,6 +237,16 @@ def lambda_handler(event, context):
             "bucket": bucket_name
         })
     }
+
+
+def _get_site_timeout_minutes():
+    param_name = os.environ["SSM_SITE_TIMEOUT_PARAM"]
+    valor = _get_ssm_parameter(param_name)
+    minutos = int(valor)
+
+    print(f"Timeout configurado: {minutos} minutos")
+
+    return minutos
 
 
 def _sns_habilitado():
@@ -577,6 +592,7 @@ def _reagendar_eventbridge(next_run):
     if not rule:
         print("EVENTBRIDGE_RULE não definida. Reagendamento ignorado.")
         return
+
 
     expression = (
         f"cron({next_run.minute} "

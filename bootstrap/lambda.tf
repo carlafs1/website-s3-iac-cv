@@ -26,6 +26,7 @@ resource "aws_lambda_function" "controle" {
       SNS_TOPIC_ARN  = aws_sns_topic.site_access_alerts.arn
       EVENTBRIDGE_RULE = "${var.app_name}-controle"
       SSM_SNS_ENABLED_PARAM = "/website-s3-iac-cv/enviar-sms"
+      SSM_SITE_TIMEOUT_PARAM = "/website-s3-iac-cv/site-timeout-minutes"
     }
   }
 
