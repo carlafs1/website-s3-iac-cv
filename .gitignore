@@ -1,0 +1,21 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Python
+__pycache__/
+*.pyc
+
+# Artefatos
+*.zip
+response.json
+
+# Variáveis locais
+*.tfvars
+terraform.tfvars
+
+# Sistema
+.DS_Store
+Thumbs.db

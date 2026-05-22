@@ -1,0 +1,42 @@
+name: Apply infraestrutura efêmera
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciais AWS via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::715428148112:role/website-s3-iac-cv-github-actions-role
+          aws-region: us-east-2
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: efemero/terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: efemero/terraform
+        run: terraform apply -auto-approve
+
+      - name: Acionar Lambda de acesso
+        run: |
+          aws lambda invoke \
+            --function-name website-s3-iac-cv-acesso \
+            --region us-east-2 \
+            response.json
+
+          cat response.json
