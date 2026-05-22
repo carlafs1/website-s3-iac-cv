@@ -234,11 +234,47 @@ def lambda_handler(event, context):
     }
 
 
+def _sns_habilitado():
+    ####--------------------------------------------------------------------####
+    ####----  Verifica se o envio de alerta SNS está habilitado.        ----####
+    ####----  O valor é controlado pelo parâmetro SSM:                  ----####
+    ####----  /website-s3-iac-cv/enviar-sms                             ----####
+    ####----                                                            ----####
+    ####----  true  = envia alerta via SNS                              ----####
+    ####----  false = não envia alerta via SNS                          ----####
+    ####--------------------------------------------------------------------####
+    param_name = os.environ.get(
+        "SSM_SNS_ENABLED_PARAM",
+        "/website-s3-iac-cv/enviar-sms"
+    )
+
+    try:
+        valor = _get_ssm_parameter(param_name)
+
+        print(f"Parâmetro de controle SNS ({param_name}): {valor}")
+
+        return valor.strip().lower() == "true"
+
+    except Exception as erro:
+        print("Erro ao consultar parâmetro de controle SNS.")
+        print(str(erro))
+        print("Por segurança, o envio SNS será bloqueado.")
+        return False
+
+
+
 def _enviar_alerta_acesso(event, now):
     ####--------------------------------------------------------------------####
     ####----  Envia alerta de acesso ao site por SNS.                    ----####
     ####----  Chamadas automáticas do EventBridge não geram e-mail.      ----####
+    ####----                                                            ----####
+    ####----  O envio é controlado pelo parâmetro SSM:                   ----####
+    ####----  /website-s3-iac-cv/enviar-sms                             ----####
     ####--------------------------------------------------------------------####
+    if not _sns_habilitado():
+        print("Envio SNS desabilitado via SSM. Alerta de acesso ignorado.")
+        return
+
     topic_arn = os.environ.get("SNS_TOPIC_ARN")
 
     if not topic_arn:

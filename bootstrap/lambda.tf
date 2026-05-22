@@ -25,6 +25,7 @@ resource "aws_lambda_function" "controle" {
       DYNAMODB_TABLE = aws_dynamodb_table.control_table.name
       SNS_TOPIC_ARN  = aws_sns_topic.site_access_alerts.arn
       EVENTBRIDGE_RULE = "${var.app_name}-controle"
+      SSM_SNS_ENABLED_PARAM = "/website-s3-iac-cv/enviar-sms"
     }
   }
 

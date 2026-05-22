@@ -62,7 +62,8 @@ resource "aws_iam_role_policy" "control_ssm" {
         ]
         Resource = [
           "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/website/github/token",
-          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/website/github/repo"
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/website/github/repo", 
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/website-s3-iac-cv/enviar-sms"
         ]
       }
     ]
