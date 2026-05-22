@@ -575,12 +575,7 @@ def _disparar_create():
 
 
 def _disparar_destroy(bucket_name):
-    _disparar_workflow(
-        DESTROY_WORKFLOW,
-        inputs={
-            "bucket_name": bucket_name
-        }
-    )
+    _disparar_workflow(DESTROY_WORKFLOW)
 
 
 def _reagendar_eventbridge(next_run):
