@@ -146,7 +146,7 @@ def lambda_handler(event, context):
 
         print(f"last_accessed_at atualizado para: {now.isoformat()}")
 
-        timeout_minutes = _get_site_timeout_minutes()
+        timeout_minutes = _get_site_timeout_minutes() - 1
         next_run = now + timedelta(minutes=timeout_minutes)
 
         print("Reagendando EventBridge conforme timeout configurado...")
@@ -183,7 +183,7 @@ def lambda_handler(event, context):
         last_accessed_at = last_accessed_at.replace(tzinfo=timezone.utc)
 
 
-    timeout_minutes = _get_site_timeout_minutes()
+    timeout_minutes = _get_site_timeout_minutes() - 1
     expiration_time = last_accessed_at + timedelta(minutes=timeout_minutes)
 
     print(f"Bucket ativo: {bucket_name}")

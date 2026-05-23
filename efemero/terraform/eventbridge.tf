@@ -7,14 +7,22 @@ data "aws_lambda_function" "controle" {
 
 
 ####----------------------------------------------------------------####
+####----  Recupera tempo de timeout do site no Parameter Store  ----####
+####----------------------------------------------------------------####
+data "aws_ssm_parameter" "lifecycle_schedule" {
+  name = "/website-s3-iac-cv/site-timeout-minutes"
+}
+
+
+####----------------------------------------------------------------####
 ####----  Cria a rule temporária do EventBridge                 ----####
 ####----  Existe somente enquanto o site efêmero estiver ativo  ----####
 ####----  A rule invoca o Lambda permanente de controle         ----####
 ####----------------------------------------------------------------####
 resource "aws_cloudwatch_event_rule" "lifecycle" {
   name                = "${var.app_name}-controle"
-  description         = "Agenda execução do Lambda de controle do ciclo de vida"
-  schedule_expression = var.lifecycle_schedule
+  description         = "Agenda execução inicial do Lambda de controle do ciclo de vida"
+  schedule_expression = "rate(${data.aws_ssm_parameter.lifecycle_schedule.value} minutes)"
   state               = "ENABLED"
 }
 

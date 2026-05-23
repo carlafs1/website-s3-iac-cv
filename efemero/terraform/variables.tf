@@ -28,12 +28,3 @@ variable "dynamodb_table_name" {
   default     = "website-lifecycle-control"
 }
 
-
-####-------------------------------------------------------------------####
-#####----  Frequência inicial de execução da regra do EventBridge  ----####
-####-------------------------------------------------------------------####
-variable "lifecycle_schedule" {
-  description = "Expressão cron do EventBridge para monitorar o ciclo de vida do ambiente"
-  type        = string
-  default     = "rate(1 hour)"
-}
