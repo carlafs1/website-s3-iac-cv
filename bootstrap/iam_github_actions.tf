@@ -128,17 +128,23 @@ resource "aws_iam_role_policy" "github_actions_terraform" {
         Resource = "arn:aws:events:us-east-2:715428148112:rule/website-s3-iac-cv-controle"
       },
       {
-        Sid    = "PassAcessoLambdaRole"
-        Effect = "Allow"
-        Action = "iam:PassRole"
+        Sid      = "PassAcessoLambdaRole"
+        Effect   = "Allow"
+        Action   = "iam:PassRole"
         Resource = "arn:aws:iam::715428148112:role/website-s3-iac-cv-acesso-lambda-role"
       },
       {
-        Sid    = "ReadAcessoLambdaRole"
-        Effect = "Allow"
-        Action = "iam:GetRole"
+        Sid      = "ReadAcessoLambdaRole"
+        Effect   = "Allow"
+        Action   = "iam:GetRole"
         Resource = "arn:aws:iam::715428148112:role/website-s3-iac-cv-acesso-lambda-role"
-      }
+      },
+      {
+        Sid      = "ReadSiteTimeoutParameter",
+        Effect   =  "Allow",
+        Action   =  "ssm:GetParameter"
+        Resource = "arn:aws:ssm:us-east-2:715428148112:parameter/website-s3-iac-cv/site-timeout-minutes"
+}
     ]
   })
 }
