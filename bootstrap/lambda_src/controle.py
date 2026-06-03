@@ -96,8 +96,8 @@ def handle_user_access(event, now, temp_item, active_items):
  
     update_last_accessed(bucket_name, now)
  
-    timeout_minutes = get_site_timeout_minutes() - 1
-    next_run = now + timedelta(minutes=timeout_minutes)
+    timeout_minutes = get_site_timeout_minutes() 
+    next_run = (now + timedelta(minutes=timeout_minutes)).replace(second=0, microsecond=0)
  
     print(f"Reagendando EventBridge. Próxima execução: {next_run.isoformat()}")
     reschedule_eventbridge(next_run)
@@ -132,7 +132,9 @@ def handle_eventbridge(now, active_items):
     if last_accessed_at.tzinfo is None:
         last_accessed_at = last_accessed_at.replace(tzinfo=timezone.utc)
  
-    timeout_minutes = get_site_timeout_minutes() - 1
+    timeout_minutes = get_site_timeout_minutes() 
+    now = now.replace(second=0, microsecond=0)
+    last_accessed_at = last_accessed_at.replace(second=0, microsecond=0)
     expiration_time = last_accessed_at + timedelta(minutes=timeout_minutes)
  
     print(f"Bucket ativo: {bucket_name}")
@@ -155,7 +157,7 @@ def handle_eventbridge(now, active_items):
  
     print("Timeout expirado. Disparando workflow destroy.")
  
-    dispatch_destroy(bucket_name)
+    dispatch_destroy()
     delete_bucket_item(bucket_name)
  
     print("Workflow destroy acionado. Item removido do DynamoDB.")

@@ -75,12 +75,7 @@ def dispatch_create():
     dispatch_workflow(CREATE_WORKFLOW)
 
 
-def dispatch_destroy(bucket_name):
+def dispatch_destroy():
     # Se o destroy.yml não aceitar inputs, remova o parâmetro inputs abaixo
     # e use apenas: dispatch_workflow(DESTROY_WORKFLOW)
-    dispatch_workflow(
-        DESTROY_WORKFLOW,
-        inputs={
-            "bucket_name": bucket_name
-        }
-    )
+    dispatch_workflow(DESTROY_WORKFLOW)
