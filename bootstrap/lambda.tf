@@ -10,6 +10,7 @@ data "archive_file" "lambda_zip" {
 
 ####--------------------------------------------####
 ####----  Cria a função Lambda de controle  ----####
+####----  Define o nome dos parâmetros      ----####
 ####--------------------------------------------####
 resource "aws_lambda_function" "controle" {
   function_name    = "${var.app_name}-controle"
@@ -27,6 +28,7 @@ resource "aws_lambda_function" "controle" {
       EVENTBRIDGE_RULE = "${var.app_name}-controle"
       SSM_SNS_ENABLED_PARAM = "/website-s3-iac-cv/enviar-sms"
       SSM_SITE_TIMEOUT_PARAM = "/website-s3-iac-cv/site-timeout-minutes"
+      SSM_SNS_DESTROY_PARAM = "/website-s3-iac-cv/enviar-alerta-destroy"
     }
   }
 

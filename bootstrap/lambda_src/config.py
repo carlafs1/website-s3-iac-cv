@@ -1,5 +1,6 @@
 ####----------------------------------------------------------------------------------------####
 ####----          Define as constantes e variáveis de ambiente do website efêmero.      ----####
+####----                            Lê variável de ambiente.                            ----####
 ####----------------------------------------------------------------------------------------####
 
 import os
@@ -18,6 +19,11 @@ SSM_SITE_TIMEOUT_PARAM = os.environ["SSM_SITE_TIMEOUT_PARAM"]
 SSM_SNS_ENABLED_PARAM = os.environ.get(
     "SSM_SNS_ENABLED_PARAM",
     "/website-s3-iac-cv/enviar-sms"
+)
+
+SSM_SNS_DESTROY_PARAM = os.environ.get(
+    "SSM_SNS_DESTROY_PARAM",
+    "/website-s3-iac-cv/enviar-alerta-destroy"
 )
 
 SNS_TOPIC_ARN = os.environ.get("SNS_TOPIC_ARN")

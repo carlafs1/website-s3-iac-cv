@@ -32,7 +32,10 @@ from dynamodb_service import (
 from eventbridge_service import reschedule_eventbridge
 from github_service import dispatch_create, dispatch_destroy
 from html_pages import waiting_page, scanner_ignored_page, error_page
-from notification_service import send_access_alert
+from notification_service import (
+    send_access_alert, 
+   send_destroy_error_alert
+)   
 from parameters import get_site_timeout_minutes
 from s3_service import bucket_exists, proxy_s3
 from security import is_trusted_access
@@ -123,6 +126,16 @@ def handle_user_access(event, now, temp_item, active_items):
  
 def handle_eventbridge(now, active_items):
     print("Origem: EventBridge.")
+
+        if not active_items:
+        print("Nenhum ambiente ativo encontrado. Nada a destruir ou reagendar.")
+
+        return {
+            "statusCode": 200,
+            "body": json.dumps({
+                "status": "no_active_environment"
+            })
+        }
  
     item = active_items[0]
     bucket_name = item["bucket_name"]
@@ -157,8 +170,21 @@ def handle_eventbridge(now, active_items):
  
     print("Timeout expirado. Disparando workflow destroy.")
  
+ try:
     dispatch_destroy()
     delete_bucket_item(bucket_name)
+
+    print("Workflow destroy acionado. Item removido do DynamoDB.")
+
+except Exception as erro:
+    print("Erro ao disparar workflow destroy.")
+    print(str(erro))
+
+    send_destroy_error_alert(
+        bucket_name=bucket_name,
+        error_message=str(erro),
+        now=now
+    )
  
     print("Workflow destroy acionado. Item removido do DynamoDB.")
  

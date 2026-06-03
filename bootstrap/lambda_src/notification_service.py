@@ -11,7 +11,10 @@
 
 from aws_clients import sns
 from config import SNS_TOPIC_ARN
-from parameters import get_sns_enabled
+from parameters import (
+    get_sns_enabled,
+    is_destroy_alert_enabled
+)    
 
 def send_access_alert(event, now):
     if not get_sns_enabled():
@@ -52,3 +55,31 @@ Referer: {referer}
     except Exception as erro:
         print("Erro ao enviar alerta por SNS.")
         print(str(erro))
+
+
+
+def send_destroy_error_alert(bucket_name, error_message, now):
+
+    if not is_destroy_alert_enabled():
+       print("Alerta de erro no destroy desabilitado via SSM.")
+      return
+
+    subject = "FALHA NO DESTROY DO PORTFÓLIO"
+
+    message = (
+        "FALHA NO DESTROY DO PORTFÓLIO EFÊMERO\n\n"
+        f"Bucket: {bucket_name}\n"
+        f"Horário UTC: {now.isoformat()}\n\n"
+        "O ambiente pode ter permanecido ativo.\n\n"
+        f"Erro:\n{error_message}\n\n"
+        "Ação recomendada:\n"
+        "Verificar logs da Lambda controle e workflow destroy.yml."
+    )
+
+    sns.publish(
+        TopicArn=SNS_TOPIC_ARN,
+        Subject=subject,
+        Message=message
+    )
+
+    print("Alerta de erro no destroy enviado via SNS.")
