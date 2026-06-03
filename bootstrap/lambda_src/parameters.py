@@ -47,4 +47,4 @@ def get_sns_enabled():
 
 def is_destroy_alert_enabled():
     valor = get_ssm_parameter(SSM_SNS_DESTROY_PARAM)
-    return valor.lower() == "true"
+    return valor.strip().lower() == "true"

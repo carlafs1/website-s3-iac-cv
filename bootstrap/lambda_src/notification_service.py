@@ -57,12 +57,15 @@ Referer: {referer}
         print(str(erro))
 
 
-
 def send_destroy_error_alert(bucket_name, error_message, now):
 
     if not is_destroy_alert_enabled():
-       print("Alerta de erro no destroy desabilitado via SSM.")
-      return
+        print("Alerta de erro no destroy desabilitado via SSM.")
+        return
+
+    if not SNS_TOPIC_ARN:
+        print("SNS_TOPIC_ARN não definida. Alerta de erro no destroy ignorado.")
+        return
 
     subject = "FALHA NO DESTROY DO PORTFÓLIO"
 
@@ -76,10 +79,15 @@ def send_destroy_error_alert(bucket_name, error_message, now):
         "Verificar logs da Lambda controle e workflow destroy.yml."
     )
 
-    sns.publish(
-        TopicArn=SNS_TOPIC_ARN,
-        Subject=subject,
-        Message=message
-    )
+    try:
+        sns.publish(
+            TopicArn=SNS_TOPIC_ARN,
+            Subject=subject,
+            Message=message
+        )
 
-    print("Alerta de erro no destroy enviado via SNS.")
+        print("Alerta de erro no destroy enviado via SNS.")
+
+    except Exception as erro:
+        print("Erro ao enviar alerta de erro no destroy via SNS.")
+        print(str(erro))
