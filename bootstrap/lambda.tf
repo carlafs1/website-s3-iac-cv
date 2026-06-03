@@ -3,8 +3,8 @@
 ####---------------------------------------------####
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda_src/controle.py"
-  output_path = "${path.module}/lambda_src/controle.zip"
+  source_dir  = "${path.module}/lambda_src"
+  output_path = "${path.module}/lambda_src.zip"
 }
 
 
