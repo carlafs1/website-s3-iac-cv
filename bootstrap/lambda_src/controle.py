@@ -46,17 +46,14 @@ def lambda_handler(event, context):
     now = datetime.now(timezone.utc)
     is_eventbridge = event.get("source") == "aws.events"
  
-    print(f"Origem do Evento: {is_eventbridge}")
+    print(f"Origem EventBridge: {is_eventbridge}")
  
-
- # Se origem não for um reagendamento, manda email informando o acesso.
     if not is_eventbridge:
         send_access_alert(event, now)
  
     items = scan_lifecycle_items()
     temp_item, active_items = split_items(items)
  
- # Se origem não for um reagendamento, manda dispara lambda acesso - cria ambiente efêmero.
     if not is_eventbridge:
         return handle_user_access(
             event=event,
@@ -64,20 +61,17 @@ def lambda_handler(event, context):
             temp_item=temp_item,
             active_items=active_items
         )
-
- # Se origem for reagendamento, chama EventBridge, que define se reagenda ou destroy.
+ 
     return handle_eventbridge(
         now=now,
         active_items=active_items
     )
- 
- 
+
+  
 def handle_user_access(event, now, temp_item, active_items):
     print("Origem: usuário/API Gateway.")
  
-    active_items = _remove_orphan_items(active_items)
  
- # Se ainda não existrir, criar infraestrutura efêmera
     if not active_items:
         print("Nenhum S3 ativo encontrado.")
  
@@ -102,7 +96,7 @@ def handle_user_access(event, now, temp_item, active_items):
  
     update_last_accessed(bucket_name, now)
  
-    timeout_minutes = get_site_timeout_minutes() 
+    timeout_minutes = get_site_timeout_minutes() - 1
     next_run = now + timedelta(minutes=timeout_minutes)
  
     print(f"Reagendando EventBridge. Próxima execução: {next_run.isoformat()}")
@@ -129,18 +123,6 @@ def handle_user_access(event, now, temp_item, active_items):
  
 def handle_eventbridge(now, active_items):
     print("Origem: EventBridge.")
- 
-    active_items = _remove_orphan_items(active_items)
- 
-    if not active_items:
-        print("Nenhum S3 ativo encontrado. Nada a destruir.")
- 
-        return {
-            "statusCode": 200,
-            "body": json.dumps({
-                "status": "no_active_site"
-            })
-        }
  
     item = active_items[0]
     bucket_name = item["bucket_name"]
@@ -185,24 +167,3 @@ def handle_eventbridge(now, active_items):
             "bucket": bucket_name
         })
     }
- 
- 
-def _remove_orphan_items(active_items):
-    """
-    Verifica cada item ativo do DynamoDB.
-    Remove do DynamoDB qualquer item cujo bucket não existe mais no S3.
-    Retorna apenas os itens válidos.
-    """
-    valid_items = []
- 
-    for item in active_items:
-        bucket_name = item["bucket_name"]
- 
-        if bucket_exists(bucket_name):
-            valid_items.append(item)
-        else:
-            print(f"Item órfão detectado: {bucket_name}. Bucket inexistente. Removendo do DynamoDB.")
-            delete_bucket_item(bucket_name)
- 
-    return valid_items
- 
