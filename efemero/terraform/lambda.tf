@@ -11,8 +11,8 @@ data "aws_iam_role" "lambda_acesso_role" {
 ####-------------------------------------------------------####
 data "archive_file" "lambda_acesso_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda_src/acesso.py"
-  output_path = "${path.module}/lambda_src/.terraform/tmp/acesso.zip"
+  source_file = "${path.module}/lambda_src/registro_bucket.py"
+  output_path = "${path.module}/lambda_src/.terraform/tmp/registro_bucket.zip"
 }
 
 
@@ -23,7 +23,7 @@ resource "aws_lambda_function" "acesso" {
   function_name    = "${var.app_name}-acesso"
   filename         = data.archive_file.lambda_acesso_zip.output_path
   source_code_hash = data.archive_file.lambda_acesso_zip.output_base64sha256
-  handler          = "acesso.lambda_handler"
+  handler          = "registro_bucket.lambda_handler"
   runtime          = "python3.12"
   role             = data.aws_iam_role.lambda_acesso_role.arn
   timeout          = 30
