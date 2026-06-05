@@ -21,6 +21,17 @@ A resposta é sim. E o processo de chegar lá exige integrar lifecycle managemen
 
 ---
 
+## Escopo do Projeto
+
+O foco deste projeto está na arquitetura, automação de infraestrutura, lifecycle management, observabilidade, segurança e FinOps.
+O frontend foi tratado como um meio para demonstrar o fluxo completo da solução. A interface foi gerada com apoio de IA generativa, e minha participação concentrou-se na definição do conteúdo, ajustes de texto e refinamentos de layout.
+
+A decisão foi intencional: o objetivo era demonstrar a capacidade de projetar e implementar uma arquitetura serverless orientada a eventos, e não desenvolver uma aplicação frontend complexa.
+
+As decisões de arquitetura, infraestrutura, automação, segurança, observabilidade, CI/CD e gerenciamento do ciclo de vida dos recursos em nuvem foram concebidas, implementadas e validadas por mim.
+
+---
+
 ## Arquitetura
 
 A solução é composta por uma camada permanente responsável pela orquestração do ciclo de vida da infraestrutura e por uma camada efêmera criada sob demanda para disponibilização do site.
