@@ -7,7 +7,7 @@
 ####----     - Envia alerta por e-mail via SNS.                                         ----####
 ####----     - Se o S3 ainda não existe, cria TEMPORARIO e dispara deploy no GitHub.    ----####
 ####----     - Se TEMPORARIO já existe, apenas retorna página de espera.                ----####
-####----  - Se o S3 existe, atualiza last_accessed_at e serve o site via proxy S3.      ----####
+####----     - Se o S3 existe, atualiza last_accessed_at e serve o site via proxy S3.   ----####
 ####----                                                                                ----####
 ####----  2. Quando chamada pelo EventBridge:                                           ----####
 ####----     - Verifica last_accessed_at no DynamoDB.                                   ----####
@@ -46,13 +46,20 @@ def lambda_handler(event, context):
     now = datetime.now(timezone.utc)
     is_eventbridge = event.get("source") == "aws.events"
 
-    print(f"Origem EventBridge: {is_eventbridge}")
-
     if not is_eventbridge:
         send_access_alert(event, now)
 
     items = scan_lifecycle_items()
     temp_item, active_items = split_items(items)
+
+    print(json.dumps({
+        "event": "lambda_execution",
+        "timestamp": now.isoformat(),
+        "origem_eventbridge": is_eventbridge,
+        "temp_item": bool(temp_item),
+        "active_items": len(active_items),
+        "bucket": active_items[0]["bucket_name"] if active_items else None
+    }))
 
     if not is_eventbridge:
         return handle_user_access(
@@ -75,13 +82,21 @@ def handle_user_access(event, now, temp_item, active_items):
         print("Nenhum S3 ativo encontrado.")
 
         if not is_trusted_access(event):
+            print(json.dumps({
+                "event": "access_rejected",
+                "reason": "scanner_or_untrusted",
+                "timestamp": now.isoformat()
+            }))
             return scanner_ignored_page()
 
         if not temp_item:
-            print("Nenhum TEMPORARIO encontrado. Criando e disparando apply.")
             create_temp_item(now)
             dispatch_create()
-            print("Workflow de criação acionado.")
+            print(json.dumps({
+                "event": "deploy_triggered",
+                "reason": "no_active_s3_no_temp_item",
+                "timestamp": now.isoformat()
+            }))
         else:
             print("Ambiente já está em processo de criação.")
 
@@ -110,8 +125,13 @@ def handle_user_access(event, now, temp_item, active_items):
         return proxy_s3(bucket_name, event)
 
     except Exception as erro:
-        print("Erro ao servir site via proxy S3.")
-        print(str(erro))
+        print(json.dumps({
+            "event": "proxy_s3_error",
+            "bucket": bucket_name,
+            "bucket_exists": bucket_exists(bucket_name),
+            "error": str(erro),
+            "timestamp": now.isoformat()
+        }))
 
         if not bucket_exists(bucket_name):
             print("Bucket desapareceu durante o acesso. Removendo item órfão.")
@@ -174,12 +194,21 @@ def handle_eventbridge(now, active_items):
     try:
         dispatch_destroy()
         delete_bucket_item(bucket_name)
-
-        print("Workflow destroy acionado. Item removido do DynamoDB.")
+        print(json.dumps({
+            "event": "destroy_triggered",
+            "bucket": bucket_name,
+            "last_accessed_at": last_accessed_at.isoformat(),
+            "expiration_time": expiration_time.isoformat(),
+            "timestamp": now.isoformat()
+        }))
 
     except Exception as erro:
-        print("Erro ao disparar workflow destroy.")
-        print(str(erro))
+        print(json.dumps({
+            "event": "destroy_error",
+            "bucket": bucket_name,
+            "error": str(erro),
+            "timestamp": now.isoformat()
+        }))
 
         send_destroy_error_alert(
             bucket_name=bucket_name,
