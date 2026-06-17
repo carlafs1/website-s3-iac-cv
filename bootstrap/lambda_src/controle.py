@@ -7,7 +7,8 @@
 ####----     - Envia alerta por e-mail via SNS.                                         ----####
 ####----     - Se o S3 ainda não existe, cria TEMPORARIO e dispara deploy no GitHub.    ----####
 ####----     - Se TEMPORARIO já existe, apenas retorna página de espera.                ----####
-####----     - Se o S3 existe, atualiza last_accessed_at e serve o site via proxy S3.   ----####
+####----     - Se o S3 existe, serve o site via proxy S3.                               ----####
+####----     - Se o acesso for confiável, atualiza last_accessed_at e reagenda timeout. ----####
 ####----                                                                                ----####
 ####----  2. Quando chamada pelo EventBridge:                                           ----####
 ####----     - Verifica last_accessed_at no DynamoDB.                                   ----####
@@ -108,16 +109,32 @@ def handle_user_access(event, now, temp_item, active_items):
 
     print(f"S3 ativo encontrado: {bucket_name}")
 
-    update_last_accessed(bucket_name, now)
+    # Segunda chamada — contexto diferente: S3 já está ativo.
+    # Aqui a decisão não é sobre acordar o ambiente,
+    # mas sobre renovar ou não o ciclo de vida
 
-    timeout_minutes = get_site_timeout_minutes()
-    next_run = (now + timedelta(minutes=timeout_minutes)).replace(
-        second=0,
-        microsecond=0
-    )
+    trusted_access = is_trusted_access(event)
 
-    print(f"Reagendando EventBridge. Próxima execução: {next_run.isoformat()}")
-    reschedule_eventbridge(next_run)
+    if trusted_access:
+        update_last_accessed(bucket_name, now)
+
+        timeout_minutes = get_site_timeout_minutes()
+        next_run = (now + timedelta(minutes=timeout_minutes)).replace(
+            second=0,
+            microsecond=0
+        )
+
+        print(f"Reagendando EventBridge. Próxima execução: {next_run.isoformat()}")
+        reschedule_eventbridge(next_run)
+
+    else:
+        print(json.dumps({
+            "event": "active_site_untrusted_access",
+            "reason": "served_without_extending_lifetime",
+            "bucket": bucket_name,
+            "timestamp": now.isoformat()
+        }))
+        print("Acesso não confiável com S3 ativo. Servindo site sem renovar last_accessed_at.")
 
     print(f"Servindo site via proxy S3. Bucket: {bucket_name}")
 
