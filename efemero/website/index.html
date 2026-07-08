@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Website Efêmero Serverless | Carla Sampaio</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.47.0/iconfont/tabler-icons.min.css">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700&family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -23,22 +24,22 @@ body{background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;f
 a{color:inherit;text-decoration:none;transition:all .2s ease}
 .container{max-width:1140px;margin:0 auto;padding:0 40px}
 
-/* NAV AJUSTADA PARA O DESIGN MINIMALISTA */
+/* NAV */
 .nav {
-  height: 95px; 
+  height: 95px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
+  position: relative;
 }
 
-/* MENOR, REFINADO E COM ESPAÇAMENTO ELEGANTE */
 .brand {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  color: #111827 !important; 
-  font-size: 24px !important; /* Tamanho menor, integrado ao alinhamento do menu */
-  font-weight: 500 !important; /* Peso intermediário para traços finos e nítidos */
-  letter-spacing: 0.15em; /* Espaçamento amplo que confere sofisticação */
+  color: #111827 !important;
+  font-size: 24px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   display: inline-block;
   line-height: 1;
@@ -47,6 +48,59 @@ a{color:inherit;text-decoration:none;transition:all .2s ease}
 .nav ul{display:flex;gap:32px;list-style:none;align-items:center}
 .nav a{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:600;opacity:.7}
 .nav a:hover{color:var(--gold2);opacity:1}
+
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:32px;height:32px;background:none;border:none;cursor:pointer;padding:0}
+.nav-toggle span{display:block;width:100%;height:2px;background:var(--text);transition:transform .2s ease, opacity .2s ease}
+
+/* DROPDOWN DE PROJETOS */
+.nav-item-dropdown{position:relative}
+.nav-item-dropdown > .dropdown-trigger{
+  cursor:default;
+  color:var(--gold2);
+  opacity:1;
+  font-weight:800;
+  border-bottom:2px solid var(--gold2);
+  padding-bottom:14px;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+.dropdown-menu{
+  position:absolute;
+  top:100%;
+  left:0;
+  margin-top:1px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:4px;
+  box-shadow:0 12px 24px rgba(0,0,0,.1);
+  min-width:180px;
+  padding:6px 0;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(4px);
+  transition:all .18s ease;
+  z-index:20;
+}
+.nav-item-dropdown:hover .dropdown-menu{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+.dropdown-menu a{
+  display:block;
+  padding:9px 16px;
+  font-size:11px;
+  text-transform:none;
+  letter-spacing:normal;
+  font-weight:500;
+  opacity:1;
+  color:var(--muted);
+  border-bottom:1px solid rgba(24,95,165,.08);
+}
+.dropdown-menu a:last-child{border-bottom:none}
+.dropdown-menu a:hover{color:var(--gold2);background:rgba(24,95,165,.05)}
+.dropdown-menu a.current{color:var(--gold);font-weight:700;background:rgba(24,95,165,.05)}
 
 /* HERO - ARQUITETURA */
 .hero{padding:90px 0;display:grid;grid-template-columns:1.2fr 1fr;gap:64px;align-items:center}
@@ -78,6 +132,25 @@ h1 span{color:var(--gold2)}
 .summary-grid ul{list-style:none;padding-left:4px}
 .summary-grid li{position:relative;padding-left:16px;margin-bottom:8px;color:var(--muted);font-size:14px}
 .summary-grid li:before{content:"→";position:absolute;left:0;color:var(--gold2)}
+
+/* OUTROS PROJETOS */
+.other-projects{padding:60px 0}
+.project-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:28px 32px;
+  box-shadow:0 15px 35px rgba(0,0,0,.03);
+  max-width:620px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.project-card h4{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text)}
+.project-card p{color:var(--muted);font-size:14px;line-height:1.6}
+.project-card-actions{display:flex;gap:10px;flex-wrap:wrap}
+.project-card-actions .btn{padding:8px 16px;font-size:10px;box-shadow:none}
+.project-card-actions .btn i{font-size:13px}
 
 /* PERFIL (SOBRE, FOTO E EXPERIÊNCIA) */
 .profile-section{padding:90px 0}
@@ -113,10 +186,36 @@ h1 span{color:var(--gold2)}
 
 @media(max-width:960px){
   .hero, .summary-grid, .profile-grid, .footer{grid-template-columns:1fr;gap:40px;height:auto;text-align:center}
-  .nav ul, .footer-actions{display:none}
+  .nav-toggle{display:flex}
+  .nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .nav-toggle.open span:nth-child(2){opacity:0}
+  .nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .nav ul{
+    display:none;flex-direction:column;align-items:flex-start;gap:0;
+    position:absolute;top:100%;left:0;right:0;background:var(--panel);
+    border-bottom:1px solid var(--line);box-shadow:0 12px 24px rgba(0,0,0,.06);
+    padding:8px 0;z-index:30;
+  }
+  .nav ul.open{display:flex}
+  .nav ul li{width:100%}
+  .nav ul li a, .nav ul li .dropdown-trigger{
+    display:block;width:100%;padding:14px 40px;opacity:1;border-bottom:1px solid rgba(24,95,165,.06);
+    border-bottom-width:0;font-size:12px;
+  }
+  .nav-item-dropdown{position:static}
+  .dropdown-trigger{border-bottom:none !important;padding-bottom:14px !important;cursor:pointer}
+  .dropdown-menu{
+    position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;
+    border:none;border-radius:0;background:var(--bg);margin-top:0;
+    max-height:0;overflow:hidden;transition:max-height .2s ease;padding:0;
+  }
+  .nav-item-dropdown.open .dropdown-menu{max-height:200px;padding:4px 0}
+  .dropdown-menu a{padding:12px 56px}
+  .footer-actions{display:none}
   .profile-sidebar{position:relative;top:0}
   h1{font-size:44px}
   .footer{flex-direction:column;gap:20px}
+  .project-card{max-width:100%;text-align:left}
 }
 </style>
 </head>
@@ -125,8 +224,17 @@ h1 span{color:var(--gold2)}
 <div class="container">
   <header class="nav">
     <a class="brand" href="#">Carla Sampaio</a>
-    <nav><ul>
-      <li><a href="#arquitetura">Arquitetura</a></li>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <nav><ul id="nav-list">
+      <li class="nav-item-dropdown">
+        <span class="dropdown-trigger" id="dropdown-trigger">Projetos ▾</span>
+        <div class="dropdown-menu">
+          <a href="#arquitetura" class="current">Arquitetura Efêmera</a>
+          <a href="https://github.com/carlafs1/ifood-case" target="_blank" rel="noopener">Case iFood</a>
+        </div>
+      </li>
       <li><a href="#perfil">Sobre Mim</a></li>
       <li><a href="https://www.linkedin.com/in/carla-fs" target="_blank">LinkedIn ↗</a></li>
       <li><a href="https://github.com/carlafs1/website-s3-iac-cv" target="_blank">GitHub ↗</a></li>
@@ -144,9 +252,9 @@ h1 span{color:var(--gold2)}
           <a class="btn" href="https://github.com/carlafs1/website-s3-iac-cv" target="_blank" rel="noopener">Ver arquitetura no GitHub ↗</a>
         </div>
       </div>
-      
+
       <div class="project-panel">
-        <div class="panel-title">Estratégia Nuvem & FinOps</div>
+        <div class="panel-title">Estratégia Nuvem &amp; FinOps</div>
         <div class="project-metrics">
           <div class="metric"><strong>~40s</strong><span>Setup Automático</span></div>
           <div class="metric"><strong>100%</strong><span>Declarativo (Terraform)</span></div>
@@ -163,7 +271,7 @@ h1 span{color:var(--gold2)}
   </main>
 </div>
 
-<!-- BLOCK DE DESTAQUES TÉCNICOS -->
+<!-- BLOCO DE DESTAQUES TÉCNICOS -->
 <section class="solution-summary">
   <div class="container summary-grid">
     <div>
@@ -184,11 +292,26 @@ h1 span{color:var(--gold2)}
   </div>
 </section>
 
+<!-- OUTROS PROJETOS -->
+<section class="other-projects">
+  <div class="container">
+    <div class="sec-title">Outros projetos</div>
+    <div class="project-card">
+      <h4>Case iFood</h4>
+      <p>Pipeline de ingestão e análise de corridas de táxi de NY, com arquitetura em camadas (Bronze/Silver/Gold) no Databricks, tratamento de qualidade de dados e respostas a perguntas de negócio via SQL.</p>
+      <div class="project-card-actions">
+        <a class="btn" href="https://github.com/carlafs1/ifood-case" target="_blank" rel="noopener"><i class="ti ti-brand-github" aria-hidden="true"></i>Ver no GitHub</a>
+        <a class="btn secondary" href="https://carlafs1.github.io/ifood-case/painel.html" target="_blank" rel="noopener"><i class="ti ti-chart-bar" aria-hidden="true"></i>Ver painel</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- GRUPO 2: PERFIL PROFISSIONAL -->
 <div class="container">
   <section id="perfil" class="profile-section">
     <div class="profile-grid">
-      
+
       <!-- SIDEBAR -->
       <aside class="profile-sidebar">
         <div class="profile-photo">
@@ -203,9 +326,9 @@ h1 span{color:var(--gold2)}
       <div class="profile-content">
         <h3>Especialista em Ambientes Críticos</h3>
         <p>Sólida experiência no desenho de soluções e engenharia de dados dentro do setor financeiro. Foco no desenvolvimento de infraestruturas cloud-native robustas, automação de pipelines, governança de dados e arquitetura ágil orientada a valor real de negócio.</p>
-        
+
         <div class="sub-title">Trajetória Profissional</div>
-        
+
         <div class="exp-item">
           <div class="exp-header">
             <h4>Arquiteta de Dados / Engenheira de Dados <span>· Banco do Brasil</span></h4>
@@ -263,6 +386,34 @@ h1 span{color:var(--gold2)}
     </div>
   </footer>
 </div>
+<script>
+  const navToggle = document.getElementById('nav-toggle');
+  const navList = document.getElementById('nav-list');
+  const dropdownTrigger = document.getElementById('dropdown-trigger');
+  const dropdownItem = dropdownTrigger.closest('.nav-item-dropdown');
+
+  navToggle.addEventListener('click', () => {
+    const isOpen = navList.classList.toggle('open');
+    navToggle.classList.toggle('open', isOpen);
+    navToggle.setAttribute('aria-expanded', isOpen);
+    if (!isOpen) dropdownItem.classList.remove('open');
+  });
+
+  dropdownTrigger.addEventListener('click', (e) => {
+    if (window.innerWidth <= 960) {
+      e.preventDefault();
+      dropdownItem.classList.toggle('open');
+    }
+  });
+
+  navList.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      navList.classList.remove('open');
+      navToggle.classList.remove('open');
+      dropdownItem.classList.remove('open');
+    });
+  });
+</script>
 
 </body>
 </html>
