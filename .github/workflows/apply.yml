@@ -19,6 +19,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::715428148112:role/website-s3-iac-cv-github-actions-role
+          role-duration-seconds: 120
           aws-region: us-east-2
 
       - name: Instalar Terraform
