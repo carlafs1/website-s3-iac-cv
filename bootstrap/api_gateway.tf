@@ -4,6 +4,7 @@
 resource "aws_apigatewayv2_api" "http_api" {
   name          = "${var.app_name}-api"
   protocol_type = "HTTP"
+  disable_execute_api_endpoint = true
 
   tags = {
     Project = var.app_name
