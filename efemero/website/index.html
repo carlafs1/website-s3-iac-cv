@@ -135,13 +135,13 @@ h1 span{color:var(--gold2)}
 
 /* OUTROS PROJETOS */
 .other-projects{padding:60px 0}
+.projects-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch}
 .project-card{
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:6px;
   padding:28px 32px;
   box-shadow:0 15px 35px rgba(0,0,0,.03);
-  max-width:620px;
   display:flex;
   flex-direction:column;
   gap:14px;
@@ -216,6 +216,7 @@ h1 span{color:var(--gold2)}
   h1{font-size:44px}
   .footer{flex-direction:column;gap:20px}
   .project-card{max-width:100%;text-align:left}
+  .projects-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -232,8 +233,8 @@ h1 span{color:var(--gold2)}
         <span class="dropdown-trigger" id="dropdown-trigger">Projetos ▾</span>
         <div class="dropdown-menu">
           <a href="#arquitetura" class="current">Arquitetura Efêmera</a>
-          <a href="#case-ifood">Case iFood</a>
-          <a href="#case-nyc-taxi">Case NYC Taxi</a>
+          <a href="#case-ifood">Case IFood - Databricks</a>
+          <a href="#case-nyc-taxi">Case IFood - AWS</a>
         </div>
       </li>
       <li><a href="#perfil">Sobre Mim</a></li>
@@ -297,8 +298,9 @@ h1 span{color:var(--gold2)}
 <section class="other-projects" id="case-ifood">
   <div class="container">
     <div class="sec-title">Outros projetos</div>
+    <div class="projects-grid">
     <div class="project-card">
-      <h4>Case iFood</h4>
+      <h4>Case IFood - Databricks</h4>
       <p>Pipeline de ingestão e análise de corridas de táxi de NY, com arquitetura em camadas (Bronze/Silver/Gold) no Databricks, tratamento de qualidade de dados e respostas a perguntas de negócio via SQL.</p>
       <div class="stack-pills">
         <span class="pill">Databricks</span><span class="pill">PySpark</span>
@@ -313,7 +315,7 @@ h1 span{color:var(--gold2)}
     </div>
 
     <div class="project-card" id="case-nyc-taxi">
-      <h4>Case NYC Taxi Lakehouse</h4>
+      <h4>Case IFood - AWS</h4>
       <p>Pipeline serverless de dados na AWS com arquitetura Bronze (Glue) → Silver (EMR Serverless + Apache Iceberg) → Gold, orquestrado por Step Functions e reprocessado mensalmente. O painel lê as tabelas Iceberg reais direto do navegador via DuckDB-Wasm, sem servidor e sem cópia de dados.</p>
       <div class="stack-pills">
         <span class="pill">AWS Glue</span><span class="pill">EMR Serverless</span>
@@ -325,6 +327,7 @@ h1 span{color:var(--gold2)}
         <a class="btn" href="https://github.com/carlafs1/NYC-Taxi-AWS" target="_blank" rel="noopener"><i class="ti ti-brand-github" aria-hidden="true"></i>Ver no GitHub</a>
         <a class="btn secondary" href="https://carlafs1.github.io/NYC-Taxi-AWS/painel.html" target="_blank" rel="noopener"><i class="ti ti-chart-bar" aria-hidden="true"></i>Ver painel</a>
       </div>
+    </div>
     </div>
   </div>
 </section>
