@@ -10,6 +10,9 @@ permissions:
 jobs:
   apply:
     runs-on: ubuntu-latest
+    # Roda em menos de 1min na pratica; 5min da folga sem deixar
+    # o job pendurado por muito tempo se algo travar.
+    timeout-minutes: 5
 
     steps:
       - name: Checkout do repositório
