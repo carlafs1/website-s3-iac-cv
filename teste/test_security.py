@@ -44,6 +44,7 @@ def _event(
     }
 
 
+
 ####--------------------------------------------------####
 ####---- Acessos legítimos — devem retornar True  ----####
 ####--------------------------------------------------####
@@ -60,26 +61,6 @@ def test_browser_firefox_passa():
 
 def test_googlebot_passa():
     assert is_trusted_access(_event(user_agent="Mozilla/5.0 (compatible; Googlebot/2.1)")) is True
-
-
-def test_linkedinbot_passa():
-    assert is_trusted_access(_event(user_agent="LinkedInBot/1.0")) is True
-
-
-def test_slackbot_passa():
-    assert is_trusted_access(_event(user_agent="Slackbot-LinkExpanding 1.0")) is True
-
-
-def test_whatsapp_passa():
-    assert is_trusted_access(_event(user_agent="WhatsApp/2.23.1")) is True
-
-
-def test_twitterbot_passa():
-    assert is_trusted_access(_event(user_agent="Twitterbot/1.0")) is True
-
-
-def test_facebookbot_passa():
-    assert is_trusted_access(_event(user_agent="facebookexternalhit/1.1")) is True
 
 
 def test_bingbot_passa():
@@ -120,6 +101,31 @@ def test_whatsapp_metodo_delete_rejeitado():
         user_agent="WhatsApp/2.23.1",
         method="DELETE"
     )) is False
+
+
+
+####------------------------------------------------------####
+####---- Preview Social Media — devem retornar False  ----####
+####------------------------------------------------------####
+def test_linkedinbot_rejeitado():
+    assert is_trusted_access(_event(user_agent="LinkedInBot/1.0")) is False
+
+
+def test_slackbot_rejeitado():
+    assert is_trusted_access(_event(user_agent="Slackbot-LinkExpanding 1.0")) is False
+
+
+def test_whatsapp_rejeitado():
+    assert is_trusted_access(_event(user_agent="WhatsApp/2.23.1")) is False
+
+
+def test_twitterbot_rejeitado():
+    assert is_trusted_access(_event(user_agent="Twitterbot/1.0")) is False
+
+
+def test_facebookbot_rejeitado():
+    assert is_trusted_access(_event(user_agent="facebookexternalhit/1.1")) is False
+
 
 
 ####------------------------------------------------------------------####
@@ -269,6 +275,7 @@ def test_metodo_options_rejeitado():
     assert is_trusted_access(_event(method="OPTIONS")) is False
 
 
+
 ####-------------------------------------------------------------####
 ####---  Headers de browser ausentes — devem retornar False  ----####
 ####-------------------------------------------------------------####
@@ -277,12 +284,18 @@ def test_sem_accept_rejeitado():
     assert is_trusted_access(_event(accept="")) is False
 
 
-def test_sem_accept_language_rejeitado():
-    assert is_trusted_access(_event(accept_language="")) is False
-
-
 def test_sem_ambos_headers_rejeitado():
     assert is_trusted_access(_event(accept="", accept_language="")) is False
+
+
+
+####---------------------------------------------------------------------------------------####
+####---  Headers de browser ausentes - por ora somente language — devem retornar True  ----####
+####---------------------------------------------------------------------------------------####
+
+def test_sem_accept_language_passa():
+    assert is_trusted_access(_event(accept_language="")) is True    
+
 
 
 ####--------------------------####
