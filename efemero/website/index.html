@@ -233,8 +233,8 @@ h1 span{color:var(--gold2)}
         <span class="dropdown-trigger" id="dropdown-trigger">Projetos ▾</span>
         <div class="dropdown-menu">
           <a href="#arquitetura" class="current">Arquitetura Efêmera</a>
-          <a href="#case-ifood">Case IFood - Databricks</a>
-          <a href="#case-nyc-taxi">Case IFood - AWS</a>
+          <a href="#card-nyc-taxi-databricks">NYC-Taxi - Databricks</a>
+          <a href="#card-nyc-taxi-aws">NYC-Taxi - AWS</a>
         </div>
       </li>
       <li><a href="#perfil">Sobre Mim</a></li>
@@ -295,12 +295,12 @@ h1 span{color:var(--gold2)}
 </section>
 
 <!-- OUTROS PROJETOS -->
-<section class="other-projects" id="case-ifood">
+<section class="other-projects" id="case-nyc-taxi">
   <div class="container">
     <div class="sec-title">Outros projetos</div>
     <div class="projects-grid">
-    <div class="project-card">
-      <h4>Case IFood - Databricks</h4>
+    <div class="project-card" id="card-nyc-taxi-databricks">
+      <h4>NYC-Taxi - Databricks</h4>
       <p>Pipeline de ingestão e análise de corridas de táxi de NY, com arquitetura em camadas (Bronze/Silver/Gold) no Databricks, tratamento de qualidade de dados e respostas a perguntas de negócio via SQL.</p>
       <div class="stack-pills">
         <span class="pill">Databricks</span><span class="pill">PySpark</span>
@@ -309,13 +309,13 @@ h1 span{color:var(--gold2)}
         <span class="pill">DuckDB-Wasm</span><span class="pill">Chart.js</span>
       </div>
       <div class="project-card-actions">
-        <a class="btn" href="https://github.com/carlafs1/ifood-case" target="_blank" rel="noopener"><i class="ti ti-brand-github" aria-hidden="true"></i>Ver no GitHub</a>
-        <a class="btn secondary" href="https://carlafs1.github.io/ifood-case/painel.html" target="_blank" rel="noopener"><i class="ti ti-chart-bar" aria-hidden="true"></i>Ver painel</a>
+        <a class="btn" href="https://github.com/carlafs1/NYC-Taxi-Databricks" target="_blank" rel="noopener"><i class="ti ti-brand-github" aria-hidden="true"></i>Ver no GitHub</a>
+        <a class="btn secondary" href="https://carlafs1.github.io/NYC-Taxi-Databricks/painel.html" target="_blank" rel="noopener"><i class="ti ti-chart-bar" aria-hidden="true"></i>Ver painel</a>
       </div>
     </div>
 
-    <div class="project-card" id="case-nyc-taxi">
-      <h4>Case IFood - AWS</h4>
+    <div class="project-card" id="card-nyc-taxi-aws">
+      <h4>NYC-Taxi - AWS</h4>
       <p>Pipeline serverless de dados na AWS com arquitetura Bronze (Glue) → Silver (EMR Serverless + Apache Iceberg) → Gold, orquestrado por Step Functions e reprocessado mensalmente. O painel lê as tabelas Iceberg reais direto do navegador via DuckDB-Wasm, sem servidor e sem cópia de dados.</p>
       <div class="stack-pills">
         <span class="pill">AWS Glue</span><span class="pill">EMR Serverless</span>
